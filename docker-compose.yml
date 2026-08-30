@@ -1,0 +1,14 @@
+services:
+  pgvector:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_USER: obaid
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: legal_rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+volumes:
+  pgvector_data:

@@ -1,0 +1,41 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Data (do NOT commit the CUAD contracts or embeddings)
+data/
+*.jsonl
+
+# Airflow
+airflow/
+*.db
+*.log
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+kaggle.json
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Hugging Face / model cache (if any)
+.cache/
