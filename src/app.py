@@ -13,7 +13,6 @@ st.markdown("Ask questions about your ingested legal documents. The AI will cite
 @st.cache_resource
 def load_models():
     embedder = SentenceTransformer('all-MiniLM-L6-v2')
-    # Ensure the API key is picked up from the environment
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     return embedder, client
 
@@ -23,14 +22,19 @@ embedder, client = load_models()
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display previous chat messages
+# Display previous chat messages and citations
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+        if "citations" in message and message["citations"]:
+            with st.expander("View Source Context"):
+                for cite in message["citations"]:
+                    st.caption(f"**Source:** `{cite['source']}` (Chunk: {cite['chunk']})")
+                    st.write(cite['content'])
+                    st.divider()
 
 # 4. Handle User Input
 if prompt := st.chat_input("E.g., What are the confidentiality obligations?"):
-    # Show user message
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -48,8 +52,9 @@ if prompt := st.chat_input("E.g., What are the confidentiality obligations?"):
             )
             cursor = conn.cursor()
             
+            # Fetch source_file and chunk_index alongside the text content
             cursor.execute("""
-                SELECT content 
+                SELECT source_file, chunk_index, content 
                 FROM document_chunks 
                 ORDER BY embedding <=> %s::vector 
                 LIMIT 3;
@@ -60,10 +65,19 @@ if prompt := st.chat_input("E.g., What are the confidentiality obligations?"):
             conn.close()
 
             # --- GENERATION PHASE ---
+            citations = []
             if not results:
                 response_text = "I couldn't find any relevant clauses in the database."
             else:
-                context = "\n\n---\n\n".join([row[0] for row in results])
+                # Package the results into a list of citation dictionaries
+                for row in results:
+                    citations.append({
+                        "source": row[0],
+                        "chunk": row[1],
+                        "content": row[2]
+                    })
+                
+                context = "\n\n---\n\n".join([row[2] for row in results])
                 
                 system_prompt = f"""
                 You are an expert legal assistant. Answer the user's question based ONLY on the provided contract excerpts.
@@ -88,8 +102,21 @@ if prompt := st.chat_input("E.g., What are the confidentiality obligations?"):
 
         except Exception as e:
             response_text = f"An error occurred: {str(e)}"
+            citations = []
 
-    # Show AI response
+    # Show AI response and citations
     with st.chat_message("assistant"):
         st.markdown(response_text)
-    st.session_state.messages.append({"role": "assistant", "content": response_text})
+        if citations:
+            with st.expander("View Source Context"):
+                for cite in citations:
+                    st.caption(f"**Source:** `{cite['source']}` (Chunk: {cite['chunk']})")
+                    st.write(cite['content'])
+                    st.divider()
+                    
+    # Save to session state
+    st.session_state.messages.append({
+        "role": "assistant", 
+        "content": response_text,
+        "citations": citations
+    })

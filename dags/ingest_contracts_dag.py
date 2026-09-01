@@ -24,7 +24,7 @@ with DAG(
 
     extract_and_chunk = BashOperator(
         task_id='extract_and_chunk',
-        bash_command=f'cd {PROJECT_ROOT} && source venv/bin/activate && python3 src/ingestion/extract_and_chunk.py'
+        bash_command=f'cd {PROJECT_ROOT} && source venv/bin/activate && python3 src/ingestion/chunk_contracts.py'
     )
 
     embed_and_load = BashOperator(
