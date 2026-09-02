@@ -1,6 +1,6 @@
 # Legal RAG Pipeline
 
-nd-to-end RAG pipeline for legal contracts using the CUAD (Contract Understanding Atticus Dataset).
+end-to-end RAG pipeline for legal contracts using the CUAD (Contract Understanding Atticus Dataset).
 
 ## What this project does
 1. Ingests and cleans 510 legal contracts from CUAD
