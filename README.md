@@ -1,4 +1,4 @@
-# Legal RAG Pipelin
+# Legal RAG Pipeline
 
 End-to-end RAG pipeline for legal contracts using the CUAD (Contract Understanding Atticus Dataset).
 
