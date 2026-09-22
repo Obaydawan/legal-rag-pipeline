@@ -2,7 +2,7 @@
 
 End-to-end RAG pipeline for legal contracts using the CUAD (Contract Understanding Atticus Dataset).
 
-## What this Project does:
+## What this Project does
 1. Ingests and cleans 510 legal contracts from CUAD
 2. Chunks the text with legal-document-aware noise removal
 3. Generates embeddings using `all-MiniLM-L6-v2`
